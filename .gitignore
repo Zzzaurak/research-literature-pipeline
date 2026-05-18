@@ -1,0 +1,29 @@
+__pycache__/
+*.pyc
+.DS_Store
+
+# Per-project research state can contain private topics, notes, papers, and refs.
+projects/*
+!projects/.gitkeep
+
+# Large or regenerated artifacts, kept for defense in depth if force-adding a project.
+projects/*/papers/*/paper.pdf
+projects/*/papers/*/paper.md
+projects/*/refs/*.bib
+*.pdf
+*.xpi
+*.bib
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.log
+
+# Local secrets
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.token
+secrets/
+credentials/

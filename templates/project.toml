@@ -1,0 +1,23 @@
+[project]
+slug = "example-project"
+title = "Example Research Project"
+topic = "A focused research question"
+created = "YYYY-MM-DD"
+status = "active"
+
+[zotero]
+collection_name = "Research - Example Research Project"
+collection_key = ""
+tags = ["project:example-project"]
+
+[screening]
+must_read_target = 5
+candidate_target = 40
+
+[mineru]
+cache_dir = "papers"
+markdown_filename = "paper.md"
+
+[bibtex]
+output_path = "refs/project.bib"
+prefer_better_bibtex = true
