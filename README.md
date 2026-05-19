@@ -119,6 +119,47 @@ python3 scripts/research_pipeline.py paper-dir projects/supernova-companion \
   --doi 10.1038/nphys1170
 ```
 
+Run the full reading step for a Zotero item that already has a PDF attachment:
+
+```bash
+python3 scripts/research_pipeline.py read-paper projects/supernova-companion \
+  --key TTWH7MG8 \
+  --language en
+```
+
+Run the full reading step from a local PDF:
+
+```bash
+python3 scripts/research_pipeline.py read-paper projects/supernova-companion \
+  --title "Measured measurement" \
+  --doi 10.1038/nphys1170 \
+  --pdf /absolute/path/to/paper.pdf \
+  --language en
+```
+
+If MinerU Markdown already exists, import it directly:
+
+```bash
+python3 scripts/research_pipeline.py read-paper projects/supernova-companion \
+  --key TTWH7MG8 \
+  --title "Measured measurement" \
+  --markdown /absolute/path/to/paper.md
+```
+
+Audit whether papers have been fully prepared for AI reading:
+
+```bash
+python3 scripts/research_pipeline.py audit projects/supernova-companion
+```
+
+Run the reading step for selected candidates from `data/candidates.jsonl`:
+
+```bash
+python3 scripts/research_pipeline.py read-selected projects/supernova-companion \
+  --statuses must-read,method,background \
+  --limit 5
+```
+
 Validate project structure:
 
 ```bash
@@ -170,6 +211,29 @@ data/screening.tsv
 ### 3. PDF To Markdown With MinerU
 
 After a selected paper is imported into Zotero, make sure it has a PDF attachment or a local PDF path. Then use `mineru-pdf-router` to convert the PDF to Markdown.
+
+The CLI can run this step directly for one paper:
+
+```bash
+python3 scripts/research_pipeline.py read-paper projects/<slug> --key <ZOTERO_ITEM_KEY>
+```
+
+Or for selected candidates:
+
+```bash
+python3 scripts/research_pipeline.py read-selected projects/<slug> --statuses must-read,method
+```
+
+This command creates or updates:
+
+```text
+papers/<paper-id>/metadata.json
+papers/<paper-id>/paper.pdf      # when the PDF comes from Zotero, --pdf, or --pdf-url
+papers/<paper-id>/paper.md
+notes/<paper-id>.md
+```
+
+`read-selected` can process candidates that have `zotero_key`, `pdf_url`, or an arXiv identifier. Candidates with only a DOI and no PDF source will be reported as failures, because the pipeline should not invent a full-paper reading from metadata alone.
 
 Save MinerU output to:
 

@@ -119,6 +119,47 @@ python3 scripts/research_pipeline.py paper-dir projects/supernova-companion \
   --doi 10.1038/nphys1170
 ```
 
+对一个已经有 PDF 附件的 Zotero 条目执行完整精读步骤：
+
+```bash
+python3 scripts/research_pipeline.py read-paper projects/supernova-companion \
+  --key TTWH7MG8 \
+  --language en
+```
+
+从本地 PDF 执行完整精读步骤：
+
+```bash
+python3 scripts/research_pipeline.py read-paper projects/supernova-companion \
+  --title "Measured measurement" \
+  --doi 10.1038/nphys1170 \
+  --pdf /absolute/path/to/paper.pdf \
+  --language en
+```
+
+如果已经有 MinerU Markdown，也可以直接导入：
+
+```bash
+python3 scripts/research_pipeline.py read-paper projects/supernova-companion \
+  --key TTWH7MG8 \
+  --title "Measured measurement" \
+  --markdown /absolute/path/to/paper.md
+```
+
+检查哪些论文还没有完成 AI 阅读准备：
+
+```bash
+python3 scripts/research_pipeline.py audit projects/supernova-companion
+```
+
+对 `data/candidates.jsonl` 里筛选出的候选文献批量执行精读步骤：
+
+```bash
+python3 scripts/research_pipeline.py read-selected projects/supernova-companion \
+  --statuses must-read,method,background \
+  --limit 5
+```
+
 校验项目结构：
 
 ```bash
@@ -171,6 +212,29 @@ data/screening.tsv
 ### 3. 用 MinerU 把 PDF 转成 Markdown
 
 将筛选后的文献导入 Zotero 后，先确认它有 PDF 附件或本地 PDF 路径。然后用 `mineru-pdf-router` 把 PDF 转为 Markdown。
+
+CLI 可以对单篇论文直接执行这一步：
+
+```bash
+python3 scripts/research_pipeline.py read-paper projects/<slug> --key <ZOTERO_ITEM_KEY>
+```
+
+也可以对筛选后的候选文献批量执行：
+
+```bash
+python3 scripts/research_pipeline.py read-selected projects/<slug> --statuses must-read,method
+```
+
+这个命令会创建或更新：
+
+```text
+papers/<paper-id>/metadata.json
+papers/<paper-id>/paper.pdf      # 当 PDF 来自 Zotero、--pdf 或 --pdf-url 时生成
+papers/<paper-id>/paper.md
+notes/<paper-id>.md
+```
+
+`read-selected` 能处理带有 `zotero_key`、`pdf_url` 或 arXiv 标识的候选文献。只有 DOI、没有 PDF 来源的候选文献会被报告为失败，因为 pipeline 不应该只凭 metadata 假装完成全文精读。
 
 把 MinerU 输出保存到：
 

@@ -6,23 +6,23 @@
 
 **Status:** unread
 
-## Why This Paper Matters
+## 为什么这篇论文重要
 
-## Research Question
+## 研究问题
 
-## Main Claims
+## 主要论断
 
-## Data / Sample
+## 数据 / 样本
 
-## Method
+## 方法
 
-## Key Figures / Tables
+## 关键图表 / 表格
 
-## Limitations
+## 局限性
 
-## Relation To This Project
+## 和本项目的关系
 
-## Quotable Claims To Cite
+## 可引用的论断
 
 ## Follow-up Papers
 
