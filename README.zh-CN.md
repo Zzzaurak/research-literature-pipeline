@@ -160,6 +160,23 @@ python3 scripts/research_pipeline.py read-selected projects/supernova-companion 
   --limit 5
 ```
 
+自动运行默认 pipeline 阶段：
+
+```bash
+python3 scripts/research_pipeline.py run projects/supernova-companion \
+  --statuses must-read,method,background \
+  --limit 5
+```
+
+`run` 会依次执行：
+
+1. 项目结构校验；
+2. 通过 `read-selected` 对筛选出的文献做全文精读；
+3. 通过 `export-bib` 导出 BibTeX；
+4. 通过 `audit` 检查是否缺 `paper.md` 或结构化笔记。
+
+它不会在精读和 BibTeX 导出之间停下来等确认。如果部分文献缺 PDF，它会报告失败项，继续导出 `.bib`，最后用非零退出码提醒这些全文阅读产物仍未完成。
+
 校验项目结构：
 
 ```bash
@@ -286,6 +303,12 @@ Fallback：
 
 ```bash
 python3 scripts/research_pipeline.py export-bib projects/<slug>
+```
+
+正常跑 pipeline 时，优先用 `run`，而不是单独手动调用精读和导出：
+
+```bash
+python3 scripts/research_pipeline.py run projects/<slug>
 ```
 
 ## 隐私与 GitHub

@@ -1,10 +1,10 @@
 # {{TITLE}}
 
-**Zotero key:** {{ZOTERO_KEY}}
+**Zotero 条目 Key:** {{ZOTERO_KEY}}
 
 **DOI:** {{DOI}}
 
-**Status:** unread
+**状态:** 未读
 
 ## 为什么这篇论文重要
 
@@ -24,8 +24,8 @@
 
 ## 可引用的论断
 
-## Follow-up Papers
+## 后续需要追踪的论文
 
-## Reading Log
+## 阅读日志
 
-- Created:
+- 创建日期:

@@ -23,6 +23,7 @@ Use this skill when the user wants to start a research project, collect and scre
    - Add candidates to `data/candidates.jsonl`.
    - Do not import every search result into Zotero.
    - Prefer importing papers classified as `must-read`, `method`, or high-value `background`.
+   - After screening, do not stop for confirmation unless the user explicitly asks for screening-only mode.
 
 4. Zotero import.
    - Use Zotero MCP tools when available.
@@ -30,18 +31,17 @@ Use this skill when the user wants to start a research project, collect and scre
    - Tag imported papers with the project tag from `project.toml`.
 
 5. PDF to Markdown.
-   - 1. Verify if a PDF attachment or local PDF path exists for every paper that should be read.
-   - 2. If no PDF is available, find/download/attach a PDF before attempting full reading. If a PDF cannot be downloaded, log the issue and notify the user to manually resolve it.
-   - 3. Run the appropriate command for reading the paper:
-     - For single papers: `python3 scripts/research_pipeline.py read-paper <project-dir> --key <ZOTERO_ITEM_KEY>`.
-     - For batches: `python3 scripts/research_pipeline.py read-selected <project-dir> --statuses must-read,method,background`.
-   - 4. Use `--pdf` or `--pdf-url` when the Zotero item does not have a local PDF attachment.
-   - 5. Ensure the command creates `papers/<paper-id>/paper.md` and `notes/<paper-id>.md`. If `paper.md` is missing, do not claim the paper has been read.
-   - 6. Mention in summaries that the source was MinerU Markdown.
+   - Prefer `python3 scripts/research_pipeline.py run <project-dir>` for the default post-screening stage.
+   - `run` automatically validates the project, reads selected papers, exports BibTeX, and audits missing artifacts.
+   - For single papers, use `python3 scripts/research_pipeline.py read-paper <project-dir> --key <ZOTERO_ITEM_KEY>`.
+   - Use `--pdf` or `--pdf-url` when the Zotero item does not have a local PDF attachment.
+   - Ensure the command creates `papers/<paper-id>/paper.md` and `notes/<paper-id>.md`. If `paper.md` is missing, do not claim the paper has been read.
+   - Mention in summaries that the source was MinerU Markdown.
 
 6. Reading notes.
    - Generate notes from `templates/reading-note.md`.
    - Save notes under `notes/`.
+   - Write reading notes in Chinese by default.
    - Focus on claims, method, data, limitations, and project relevance.
 
 7. Literature map.
@@ -50,6 +50,7 @@ Use this skill when the user wants to start a research project, collect and scre
    - Keep claims linked to specific papers.
 
 8. BibTeX export.
+   - BibTeX export is part of the default `run` command.
    - Prefer Better BibTeX auto-export when configured.
    - Otherwise use `research_pipeline.py export-bib` or `zotero_local_export_bibtex`.
 

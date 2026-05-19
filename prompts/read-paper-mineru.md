@@ -1,30 +1,30 @@
-# Read Paper With MinerU Prompt
+# 使用 MinerU 精读论文 Prompt
 
-Use this after a PDF has been converted to Markdown by `mineru-pdf-router`.
+在 PDF 已经通过 `mineru-pdf-router` 转成 Markdown 后使用。
 
-## Inputs
+## 输入
 
-- Project topic:
-- Zotero metadata:
-- MinerU Markdown:
+- 项目主题：
+- Zotero metadata：
+- MinerU Markdown：
 
-## Task
+## 任务
 
-Read the Markdown as semantic extraction from the PDF. Do not assume visual layout fidelity.
+把 Markdown 当作 PDF 的语义抽取结果来读。不要假设它完整保留了原 PDF 的视觉排版。
 
-Generate a structured reading note with:
+生成一份中文结构化阅读笔记，必须包含：
 
-1. Why this paper matters.
-2. Research question.
-3. Main claims.
-4. Data / sample.
-5. Method.
-6. Key figures / tables.
-7. Limitations.
-8. Relation to this project.
-9. Quotable claims to cite.
-10. Follow-up papers.
+1. 为什么这篇论文重要。
+2. 研究问题。
+3. 主要论断。
+4. 数据 / 样本。
+5. 方法。
+6. 关键图表 / 表格。
+7. 局限性。
+8. 和本项目的关系。
+9. 可引用的论断。
+10. 后续需要追踪的论文。
 
-## Output
+## 输出
 
-Write the note in the format of `templates/reading-note.md`.
+按 `templates/reading-note.md` 的格式写入中文笔记。

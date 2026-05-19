@@ -100,6 +100,11 @@ markdown_filename = "paper.md"
 [bibtex]
 output_path = "refs/project.bib"
 prefer_better_bibtex = true
+
+[pipeline]
+auto_read_selected = true
+auto_export_bib = true
+default_read_statuses = ["must-read", "method", "background"]
 '''
 
 
@@ -404,17 +409,17 @@ def generate_reading_note(
 
     return f"""# {title}
 
-**Zotero key:** {zotero_key}
+**Zotero 条目 Key:** {zotero_key}
 
 **DOI:** {doi}
 
-**Status:** MinerU draft
+**状态:** MinerU 自动草稿
 
 **项目主题:** {project_topic}
 
-**PDF/source:** {pdf_path}
+**PDF / 来源:** {pdf_path}
 
-**Markdown:** {markdown_path}
+**Markdown 路径:** {markdown_path}
 
 **来源说明:** 本笔记由 pipeline 基于 MinerU Markdown 自动生成，适合后续让 AI 继续精读和人工复核。MinerU 输出偏语义抽取，不保证版面完全还原。
 
@@ -457,16 +462,16 @@ def generate_reading_note(
 
 ## 可引用的论断
 
-- 待 AI 精读后从 `paper.md` 中提取具体 claim，并绑定到论文题名和 Zotero key。
+- 待 AI 精读后从 `paper.md` 中提取具体 claim，并绑定到论文题名和 Zotero 条目 Key。
 
-## Follow-up Papers
+## 后续需要追踪的论文
 
 - 待从 introduction、related work 和 reference list 中提取。
 
-## Reading Log
+## 阅读日志
 
-- Created: {now_date()}
-- Markdown word-like tokens: {word_count}
+- 创建日期: {now_date()}
+- Markdown 近似词元数: {word_count}
 """
 
 
@@ -551,7 +556,7 @@ def read_paper(args: argparse.Namespace) -> None:
         zotero_key=args.key or "",
         doi=doi or "",
         project_topic=config.get("project", {}).get("topic", ""),
-        pdf_path=str(pdf_target) if pdf_target.exists() else (pdf_source_text or "PDF not cached in project"),
+        pdf_path=str(pdf_target) if pdf_target.exists() else (pdf_source_text or "项目中未缓存 PDF"),
         markdown_path=markdown_target,
         markdown=markdown_target.read_text(encoding="utf-8"),
     )
@@ -686,6 +691,70 @@ def read_selected(args: argparse.Namespace) -> None:
         print("\nFailures:")
         for title, reason in failures:
             print(f"- {title}: {reason}")
+        raise SystemExit(1)
+
+
+def run_pipeline(args: argparse.Namespace) -> None:
+    project_dir = Path(args.project_dir).resolve()
+    config = load_project(project_dir)
+
+    print("== validate ==")
+    validate_project(argparse.Namespace(project_dir=str(project_dir)))
+
+    read_failed = False
+    if not args.skip_reading:
+        print("\n== read selected papers ==")
+        default_statuses = ",".join(
+            config.get("pipeline", {}).get(
+                "default_read_statuses", ["must-read", "method", "background"]
+            )
+        )
+        read_args = argparse.Namespace(
+            project_dir=str(project_dir),
+            statuses=args.statuses or default_statuses,
+            limit=args.limit,
+            zotero_base=args.zotero_base,
+            mineru_plugin_root=args.mineru_plugin_root,
+            mineru_timeout=args.mineru_timeout,
+            language=args.language,
+            page_range=args.page_range,
+            ocr=args.ocr,
+            dry_run=False,
+            stop_on_error=False,
+        )
+        try:
+            read_selected(read_args)
+        except SystemExit as exc:
+            read_failed = True
+            print(f"\nread-selected completed with failures: {exc}")
+    else:
+        print("\n== read selected papers ==\nskipped by --skip-reading")
+
+    export_failed = False
+    if not args.skip_bib:
+        print("\n== export bibtex ==")
+        export_args = argparse.Namespace(
+            project_dir=str(project_dir),
+            collection_key=args.collection_key,
+            limit=None,
+            zotero_base=args.zotero_base,
+        )
+        try:
+            export_bib(export_args)
+        except SystemExit as exc:
+            export_failed = True
+            print(f"\nexport-bib failed: {exc}")
+    else:
+        print("\n== export bibtex ==\nskipped by --skip-bib")
+
+    print("\n== audit ==")
+    try:
+        audit_project(argparse.Namespace(project_dir=str(project_dir)))
+    except SystemExit as exc:
+        print(f"audit reported incomplete reading artifacts: {exc}")
+        read_failed = True
+
+    if read_failed or export_failed:
         raise SystemExit(1)
 
 
@@ -842,6 +911,24 @@ def build_parser() -> argparse.ArgumentParser:
     selected.add_argument("--dry-run", action="store_true")
     selected.add_argument("--stop-on-error", action="store_true")
     selected.set_defaults(func=read_selected)
+
+    run = sub.add_parser(
+        "run",
+        help="Run the default pipeline stage: validate, read selected papers, export BibTeX, audit",
+    )
+    run.add_argument("project_dir")
+    run.add_argument("--statuses", default="")
+    run.add_argument("--limit", type=int)
+    run.add_argument("--collection-key", default="")
+    run.add_argument("--zotero-base", default=DEFAULT_ZOTERO_BASE)
+    run.add_argument("--mineru-plugin-root", default="")
+    run.add_argument("--mineru-timeout", type=int, default=DEFAULT_MINERU_TIMEOUT)
+    run.add_argument("--language", default="en")
+    run.add_argument("--page-range", default="")
+    run.add_argument("--ocr", action="store_true")
+    run.add_argument("--skip-reading", action="store_true")
+    run.add_argument("--skip-bib", action="store_true")
+    run.set_defaults(func=run_pipeline)
 
     export = sub.add_parser("export-bib", help="Export BibTeX through Zotero local API")
     export.add_argument("project_dir")

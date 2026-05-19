@@ -21,3 +21,8 @@ markdown_filename = "paper.md"
 [bibtex]
 output_path = "refs/project.bib"
 prefer_better_bibtex = true
+
+[pipeline]
+auto_read_selected = true
+auto_export_bib = true
+default_read_statuses = ["must-read", "method", "background"]

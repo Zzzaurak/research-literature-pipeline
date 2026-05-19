@@ -160,6 +160,23 @@ python3 scripts/research_pipeline.py read-selected projects/supernova-companion 
   --limit 5
 ```
 
+Run the default pipeline stage automatically:
+
+```bash
+python3 scripts/research_pipeline.py run projects/supernova-companion \
+  --statuses must-read,method,background \
+  --limit 5
+```
+
+`run` performs:
+
+1. project validation,
+2. selected-paper full reading through `read-selected`,
+3. BibTeX export through `export-bib`,
+4. audit for missing `paper.md` or notes.
+
+It does not wait for confirmation between reading and BibTeX export. If some papers lack PDFs, it reports those failures, continues to export `.bib`, and exits non-zero so the missing full-reading artifacts are visible.
+
 Validate project structure:
 
 ```bash
@@ -285,6 +302,12 @@ Fallback:
 
 ```bash
 python3 scripts/research_pipeline.py export-bib projects/<slug>
+```
+
+For normal pipeline runs, use `run` instead of invoking reading and BibTeX export separately:
+
+```bash
+python3 scripts/research_pipeline.py run projects/<slug>
 ```
 
 ## Privacy And GitHub
