@@ -27,3 +27,5 @@ projects/*/refs/*.bib
 *.token
 secrets/
 credentials/
+
+output/

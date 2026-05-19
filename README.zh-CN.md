@@ -2,15 +2,63 @@
 
 这是一个面向科研项目启动阶段的文献工作流项目，用来把 Codex、Zotero、MinerU PDF Router 和 Better BibTeX 串起来。
 
-目标流程：
+这个目录目前是 **项目模板 + 轻量 CLI + Codex skill 草稿**，不是完整插件。Zotero 继续作为 metadata、collection、tag、PDF 和 citation key 的主库；这个 repo 保存流程状态、筛选表、AI 易读 Markdown 缓存、阅读笔记、文献地图、prompt 和导出的 BibTeX。
 
-1. 项目启动
-2. 文献发现与筛选
-3. 自动读文献
-4. 生成文献地图
-5. 导出 Better BibTeX / BibTeX `.bib`
+## 什么东西放在哪里
 
-这个目录目前是 **项目模板 + 轻量 CLI + Codex skill 草稿**，不是完整插件。这样做更容易同步到 GitHub，也方便在另一台电脑上拉下来后继续使用。
+- **Zotero**：metadata、collection、tag、PDF 附件、必要时的 Zotero note、Better BibTeX citation key。
+- **这个 repo**：项目配置、候选文献表、筛选结果、MinerU Markdown 缓存、阅读笔记、文献地图、导出的 `.bib`。
+- **MinerU**：把本地或远程 PDF 转成适合 AI 阅读的语义 Markdown。
+- **Better BibTeX**：提供稳定 citation key 和首选 `.bib` 导出。
+
+## Pipeline
+
+1. **项目启动**
+   - 创建项目目录。
+   - 定义主题、范围、搜索词、Zotero collection 名、tag 和输出路径。
+
+2. **文献发现与筛选**
+   - 先收集候选文献 metadata。
+   - 先筛选，再决定哪些文献导入 Zotero。
+   - 使用 `must-read`、`method`、`background`、`maybe`、`exclude` 等状态。
+
+3. **自动读文献**
+   - 将筛选后的文献导入 Zotero。
+   - 确保要阅读的每篇文献有 PDF 附件或本地 PDF 路径。
+   - 用 MinerU 把 PDF 转成 Markdown。
+   - 把 Markdown 保存为 `papers/<paper-id>/paper.md`。
+   - 生成结构化阅读笔记 `notes/<paper-id>.md`。
+
+4. **文献地图**
+   - 默认用中文书写文献地图。
+   - 汇总核心论文、方法、时间线、争议点、open questions 和写作引用计划。
+
+5. **Better BibTeX 导出**
+   - 优先使用 Better BibTeX 自动导出，以获得稳定 citation key。
+   - 如果 Better BibTeX 还没配置好，使用 Zotero local API fallback。
+
+## 重要：自动读文献需要 PDF 和 Markdown
+
+Zotero 里可能只有 metadata。metadata 足够做筛选，但不够做全文自动阅读。
+
+每一篇需要 AI 阅读的论文，项目里应该有：
+
+```text
+projects/<slug>/papers/<paper-id>/
+  metadata.json
+  paper.md
+notes/<paper-id>.md
+```
+
+`paper.md` 不会从 Zotero 自动出现。它必须由 PDF 经过 MinerU 转换得到。PDF 来源可以是：
+
+- Zotero 里已经保存的 PDF 附件；
+- 从 arXiv、出版社页面、ADS、Semantic Scholar 等来源下载的 PDF；
+- 你手动提供的本地 PDF。
+
+如果 `paper.md` 缺失，AI 不应该声称已经读过全文。它应该先找到或下载 PDF，调用 MinerU，保存 Markdown，然后再生成阅读笔记。
+
+对 arXiv 论文，如果能拿到 TeX 源码，TeX 有时比 PDF 更适合 AI 读取；没有 TeX 时再使用 PDF + MinerU。
 
 ## 目录结构
 
@@ -28,7 +76,7 @@ research-literature-pipeline/
 每个研究项目的结构：
 
 ```text
-projects/<项目名>/
+projects/<slug>/
   project.toml
   data/candidates.jsonl
   data/screening.tsv
@@ -38,7 +86,7 @@ projects/<项目名>/
   refs/
 ```
 
-默认 `.gitignore` 会忽略 `projects/*`，因为这些文件可能包含你的研究方向、候选论文、笔记、PDF、MinerU Markdown 和参考文献库。公开 GitHub 仓库建议只同步模板、脚本和 prompt；具体研究项目更适合放私有仓库或本地同步盘。
+默认 `.gitignore` 会忽略 `projects/*`，因为真实项目文件可能包含你的研究方向、候选论文判断、笔记、PDF、MinerU Markdown 和 `.bib` 文件。公开 GitHub 仓库建议只同步 pipeline 本身；具体研究项目更适合放私有仓库或本地同步盘。
 
 ## 快速开始
 
@@ -62,7 +110,7 @@ python3 scripts/research_pipeline.py add-candidate projects/supernova-companion 
   --reason "测试 Zotero 导入和笔记生成流程"
 ```
 
-为 Zotero 中的一篇文献创建缓存目录和笔记模板：
+为 Zotero 中的一篇文献创建缓存目录和阅读笔记模板：
 
 ```bash
 python3 scripts/research_pipeline.py paper-dir projects/supernova-companion \
@@ -77,7 +125,7 @@ python3 scripts/research_pipeline.py paper-dir projects/supernova-companion \
 python3 scripts/research_pipeline.py validate projects/supernova-companion
 ```
 
-导出 BibTeX：
+通过 Zotero local API fallback 导出 BibTeX：
 
 ```bash
 python3 scripts/research_pipeline.py export-bib projects/supernova-companion
@@ -91,10 +139,10 @@ python3 scripts/research_pipeline.py export-bib projects/supernova-companion
 
 ```text
 我想研究 Type Ia supernova early light curve constraints on companion interaction。
-请帮我启动一个文献项目，生成关键词、筛选标准和 Zotero collection/tag 方案。
+请帮我启动一个文献项目，生成关键词、筛选标准、Zotero collection/tag 方案和项目目录。
 ```
 
-产物：
+预期产物：
 
 - `project.toml`
 - 搜索关键词
@@ -105,7 +153,7 @@ python3 scripts/research_pipeline.py export-bib projects/supernova-companion
 
 先只收集 metadata，不要一开始就把所有论文塞进 Zotero。
 
-候选文献建议分成：
+使用这些状态：
 
 - `must-read`：必须读
 - `method`：方法相关
@@ -113,55 +161,49 @@ python3 scripts/research_pipeline.py export-bib projects/supernova-companion
 - `maybe`：可能相关
 - `exclude`：排除，并记录原因
 
-筛选结果保存在：
+筛选文件：
 
 ```text
 data/candidates.jsonl
 data/screening.tsv
 ```
 
-### 3. 自动读文献
+### 3. 用 MinerU 把 PDF 转成 Markdown
 
-Zotero 负责保存 metadata 和 PDF。AI 易读文本保存在项目目录。
+将筛选后的文献导入 Zotero 后，先确认它有 PDF 附件或本地 PDF 路径。然后用 `mineru-pdf-router` 把 PDF 转为 Markdown。
 
-推荐每篇论文缓存：
-
-```text
-papers/<paper-id>/
-  metadata.json
-  paper.md
-notes/<paper-id>.md
-```
-
-其中 `paper.md` 来自 MinerU PDF Router 的 Markdown 输出。
-
-### 4. 使用 MinerU 转 PDF
-
-当 Zotero 中有 PDF 后，用 `mineru-pdf-router` 把 PDF 转成 Markdown。MinerU 输出更适合 AI 阅读、总结和问答，但它不是排版级复刻；如果要检查图表布局，仍然要回到原 PDF。
-
-建议把 MinerU 输出保存为：
+把 MinerU 输出保存到：
 
 ```text
-projects/<项目名>/papers/<paper-id>/paper.md
+projects/<slug>/papers/<paper-id>/paper.md
 ```
 
-然后用：
+MinerU 输出是适合 AI 阅读的语义 Markdown，不是版面级复刻。如果要确认图表排版、页码、复杂公式或图像细节，仍然要回到原 PDF。
+
+### 4. 阅读笔记
+
+使用：
 
 ```text
 prompts/read-paper-mineru.md
+templates/reading-note.md
 ```
 
-生成结构化阅读笔记。
+笔记保存到：
+
+```text
+notes/<paper-id>.md
+```
 
 ### 5. 文献地图
 
-多篇论文读完后，更新：
+更新：
 
 ```text
 maps/literature-map.md
 ```
 
-文献地图应包含：
+文献地图默认用中文书写，并包含：
 
 - 核心问题
 - 阅读优先级
@@ -172,27 +214,26 @@ maps/literature-map.md
 - open questions
 - 写作引用计划
 
-### 6. 导出 `.bib`
+### 6. 导出 BibTeX
 
-优先使用 Better BibTeX 的自动导出，以获得稳定 citation key。
+优先使用 Better BibTeX 自动导出，以获得稳定 citation key。
 
-如果 Better BibTeX 还没配置好，可以先用脚本的 Zotero local API fallback：
+Fallback：
 
 ```bash
-python3 scripts/research_pipeline.py export-bib projects/<项目名>
+python3 scripts/research_pipeline.py export-bib projects/<slug>
 ```
 
 ## 隐私与 GitHub
 
-公开 GitHub 前请注意：
+不要提交：
 
-- 不要提交 Zotero API key、MinerU token、代理配置、Cookie。
-- 不要提交 Zotero 数据库，例如 `zotero.sqlite`。
-- 不要提交 PDF、MinerU Markdown、真实 reading notes，除非你确定可以公开。
-- 不要默认提交 `projects/*`；里面可能包含未发表研究方向和文献判断。
-- `.bib` 也可能暴露你的研究主题，公开前检查是否合适。
+- Zotero API key、MinerU token、代理配置、Cookie。
+- Zotero 数据库，例如 `zotero.sqlite`。
+- PDF、MinerU Markdown、真实 reading notes 或项目 `.bib`，除非你确定可以公开。
+- 默认不要提交 `projects/*`。
 
-当前仓库默认忽略这些内容：
+默认忽略：
 
 - `projects/*`
 - `*.pdf`
@@ -208,10 +249,10 @@ python3 scripts/research_pipeline.py export-bib projects/<项目名>
 ## 在另一台电脑上使用
 
 1. 安装 Zotero。
-2. 安装 Better BibTeX 插件。
-3. 配置 Codex 的 Zotero MCP。
+2. 安装 Better BibTeX。
+3. 配置 Codex Zotero MCP。
 4. 配置 MinerU PDF Router。
-5. 从 GitHub 克隆本项目。
+5. 从 GitHub clone 本仓库。
 6. 在 `research-literature-pipeline/` 内运行 CLI。
 
-敏感配置不要放进 GitHub，应放在每台机器自己的本地配置里。
+敏感配置放在每台机器自己的本地配置里，不要放进 GitHub。

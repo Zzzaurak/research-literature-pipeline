@@ -1,32 +1,32 @@
-# {{PROJECT_TITLE}} Literature Map
+# {{PROJECT_TITLE}} 文献地图
 
-## Core Question
+## 核心问题
 
-## Reading Priority
+## 阅读优先级
 
-| Priority | Paper | Why |
+| 优先级 | 论文 | 为什么要读 |
 | --- | --- | --- |
 
-## Timeline
+## 领域时间线
 
-| Year | Paper | Contribution |
+| 年份 | 论文 | 主要贡献 |
 | --- | --- | --- |
 
-## Method Families
+## 方法分类
 
-| Method | Representative Papers | Assumptions | Strengths | Weaknesses |
+| 方法 | 代表论文 | 关键假设 | 优点 | 局限 |
 | --- | --- | --- | --- | --- |
 
-## Key Claims And Evidence
+## 关键论断与证据
 
-| Claim | Supporting Papers | Contrasting Papers | Confidence |
+| 论断 | 支持论文 | 相反或限制性证据 | 可信度 |
 | --- | --- | --- | --- |
 
-## Controversies
+## 争议点
 
-## Open Questions
+## 开放问题
 
-## Citation Plan
+## 写作引用计划
 
-| Paper Section | Claim | Sources |
+| 论文/报告段落 | 需要支撑的论断 | 建议引用 |
 | --- | --- | --- |

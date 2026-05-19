@@ -30,8 +30,11 @@ Use this skill when the user wants to start a research project, collect and scre
    - Tag imported papers with the project tag from `project.toml`.
 
 5. PDF to Markdown.
+   - For every paper that should be read, first verify that a PDF attachment or local PDF path exists.
+   - If no PDF is available, find/download/attach a PDF before attempting full reading.
    - Use `mineru-pdf-router` for semantic PDF-to-Markdown conversion.
    - Save MinerU output to `papers/<paper-id>/paper.md`.
+   - If `paper.md` is missing, do not claim the paper has been read.
    - Mention in summaries that the source was MinerU Markdown.
 
 6. Reading notes.
@@ -41,6 +44,7 @@ Use this skill when the user wants to start a research project, collect and scre
 
 7. Literature map.
    - Update `maps/literature-map.md`.
+   - Write the literature map in Chinese by default.
    - Keep claims linked to specific papers.
 
 8. BibTeX export.
@@ -51,5 +55,6 @@ Use this skill when the user wants to start a research project, collect and scre
 
 - Keep PDFs in Zotero and AI-readable Markdown in the project directory.
 - Cache MinerU output and avoid repeated parsing.
+- Treat `paper.md` as the required input for automatic full-paper reading.
 - Do not store API keys or tokens in the project.
 - Be explicit about excluded papers and why they were excluded.

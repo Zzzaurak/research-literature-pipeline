@@ -1,23 +1,24 @@
-# Literature Map Prompt
+# 文献地图 Prompt
 
-Use this after several reading notes have been generated.
+在已经生成若干篇 reading notes 后使用。
 
-## Task
+## 任务
 
-Synthesize the notes into a literature map:
+把阅读笔记综合成一份中文文献地图：
 
-1. Core question.
-2. Reading priority.
-3. Timeline.
-4. Method families.
-5. Key claims and evidence.
-6. Controversies.
-7. Open questions.
-8. Citation plan for future writing.
+1. 核心问题。
+2. 阅读优先级。
+3. 领域时间线。
+4. 方法分类。
+5. 关键 claim 与证据。
+6. 争议点。
+7. Open questions。
+8. 后续写作的引用计划。
 
-## Constraints
+## 约束
 
-- Separate what the papers show from what you infer.
-- Mark weak evidence explicitly.
-- Prefer paper-level claims over generic field summaries.
-- Keep citation suggestions tied to specific claims.
+- 默认用中文书写。
+- 区分“论文直接证明/展示的内容”和“你基于论文做出的推断”。
+- 对证据较弱或只适用于特定样本的结论要明确标注。
+- 优先总结 paper-level claims，不要只写泛泛的领域介绍。
+- 每条引用建议都要绑定到具体 claim。
